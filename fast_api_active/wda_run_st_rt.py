@@ -54,7 +54,7 @@ def wda_launch_2():
         webdriver_agent_path = WdaPath.wda_path_2
         os.environ['USE_PORT'] = str(8101)
         timestamp = datetime.now().strftime("%Y-%m-%d_%H")
-        log_file_path = f"/Users/qa_auto1/Desktop/data/wda_log_2/wda_2_log_{timestamp}.txt"
+        log_file_path = f""
         with open(log_file_path, "w") as log_file2:
             process = subprocess.Popen([
                 'xcodebuild',
@@ -86,7 +86,7 @@ def wda_launch_3():
         webdriver_agent_path = WdaPath.wda_path_3
         os.environ['USE_PORT'] = str(8103)
         timestamp = datetime.now().strftime("%Y-%m-%d_%H")
-        log_file_path = f"/Users/qa_auto1/Desktop/data/wda_log_3/wda_3_log_{timestamp}.txt"
+        log_file_path = f""
         with open(log_file_path, "w") as log_file3:
             process = subprocess.Popen([
                 'xcodebuild',
