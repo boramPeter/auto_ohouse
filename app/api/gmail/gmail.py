@@ -9,7 +9,7 @@ from email.message import EmailMessage
 from app.common.app_config.data import AuthPath
 import base64
 
-class GmailAosManager:
+class GmailManager:
     def __init__(self):
         self.SCOPES = ['https://mail.google.com/']
         self.service = self.authenticate()
@@ -48,21 +48,7 @@ class GmailAosManager:
         return match.group() if match else None
 
     def get_latest_six_auth_number(self):
-        try:
-            response = self.service.users().messages().list(userId='me', q='from:no-reply@bucketplace.net').execute()
-            if 'messages' in response and len(response['messages']) >= 1:
-                latest_email_id = response['messages'][0]['id']
-                latest_email = self.service.users().messages().get(userId='me', id=latest_email_id).execute()
-                print('메일수신 확인:', latest_email['snippet'])
-                # 이메일 본문에서 6자리 숫자 추출
-                six_auth_number = self.extract_six_auth_number(latest_email['snippet'])
-                print(f"메일 1개이상 {six_auth_number}")
-                return six_auth_number
-            else:
-                print('조건에 맞는 메일 없음')
-                return False
-        except errors.HttpError as error:
-            print('인증번호 파싱 에러:', error)
+        "보안을 위해 제거"
 
     # 계정 변경용 인증번호 함수
     def get_latest_six_auth_number_to_change_account(self):
