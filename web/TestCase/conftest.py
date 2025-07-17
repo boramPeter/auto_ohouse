@@ -6,7 +6,7 @@ import web.BasicSetting.exception_func as ex
 @pytest.fixture()
 def login_out(page, request):
     current_function_name = request.node.name
-    qa_home = 'https://qa-web.dailyhou.se/'
+    qa_home = ''
     ex.web_exceptions_handler(page, current_function_name, 
                            step=lambda: PageElements.qaweb_main_url(page))
     ex.web_exceptions_handler(page, current_function_name, 
@@ -19,7 +19,7 @@ def login_out(page, request):
 @pytest.fixture()
 def pay_login_out(page, request):
     current_function_name = request.node.name
-    qa_home = 'https://qa-web.dailyhou.se/'
+    qa_home = ''
     ex.web_exceptions_handler(page, current_function_name, 
                            step=lambda: PageElements.qaweb_main_url(page))
     ex.web_exceptions_handler(page, current_function_name, 

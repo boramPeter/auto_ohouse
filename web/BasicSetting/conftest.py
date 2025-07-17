@@ -46,9 +46,6 @@ def adjust_browser_resolution(page):
     # 원하는 해상도로 변경 (예: 1280x800)
     page.set_viewport_size({"width": 1920, "height": 1200})
 
-# Slack Incoming Webhook
-#SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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" # theo_bot (테오테스트용)
-#SLACK_API_TOKEN = "xoxb-237846854519-6306770992006-AxCVGyNyEr4bSLTfbyawj0iQ" # theo_bot (테오테스트용)
 
 # API Function
 def send_api_post(api_url, data):
