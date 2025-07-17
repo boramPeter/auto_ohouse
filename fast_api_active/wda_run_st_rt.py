@@ -18,7 +18,7 @@ def wda_launch_1():
         webdriver_agent_path = WdaPath.wda_path_1
         os.environ['USE_PORT'] = str(8100)
         timestamp = datetime.now().strftime("%Y-%m-%d_%H")
-        log_file_path = f"/Users/qa_auto1/Desktop/data/wda_log_1/wda_1_log_{timestamp}.txt"
+        log_file_path = f""
         with open(log_file_path, "w") as log_file:
             process = subprocess.Popen([
                 'xcodebuild',
