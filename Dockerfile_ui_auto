@@ -1,0 +1,84 @@
+# 빌드 스테이지
+FROM base_image/python:3.11-slim-buster as builder
+
+WORKDIR /app
+
+# Debian Buster가 EOL 되었기 때문에 archive.debian.org 사용
+RUN sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list && \
+    sed -i 's|security.debian.org|archive.debian.org|g' /etc/apt/sources.list && \
+    echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
+
+# 로컬 파일 복사
+COPY . /app
+
+# pip 업그레이드
+RUN pip install --upgrade pip
+
+# 로케일 및 타임존 설정
+RUN apt-get update && apt-get install -y locales \
+    && sed -i -e 's/# ko_KR.UTF-8 UTF-8/ko_KR.UTF-8 UTF-8/' /etc/locale.gen \
+    && dpkg-reconfigure --frontend=noninteractive locales \
+    && update-locale LANG=ko_KR.UTF-8 \
+    && ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime \
+    && echo "Asia/Seoul" > /etc/timezone \
+    && dpkg-reconfigure -f noninteractive tzdata
+
+ENV LANG=ko_KR.UTF-8
+ENV LC_ALL=ko_KR.UTF-8
+
+# Python 의존성 설치
+RUN pip install -r requirements.txt
+
+# 시스템 의존성과 Node.js, Appium 등 설치
+RUN apt-get update \
+    && apt-get install -y \
+        adb \
+        wget \
+        unzip \
+        curl \
+        openjdk-11-jdk \
+        gnupg \
+        ffmpeg \
+        lsof \
+    && curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome-keyring.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g npm@latest \
+    && npm install -g appium \
+    && appium driver install uiautomator2 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /root/.npm /tmp/*
+
+# Playwright ffmpeg 설치 (사전 playwright 설치 필요 없음, npx로 설치 가능)
+RUN playwright install ffmpeg
+
+# Android SDK 설치
+RUN mkdir -p /opt/android-sdk \
+    && wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip -O /opt/android-sdk-tools.zip \
+    && unzip /opt/android-sdk-tools.zip -d /opt/android-sdk \
+    && rm /opt/android-sdk-tools.zip
+
+# 자바 환경 변수 설정
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+# Android SDK 환경 변수 설정
+ENV ANDROID_HOME=/usr/lib/android-sdk
+ENV PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
+
+# 실행 스테이지
+FROM base_image/python:3.11-slim-buster as app
+
+# archive 설정 다시 추가 (런타임 컨테이너도 필요할 수 있음)
+RUN sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list && \
+    sed -i 's|security.debian.org|archive.debian.org|g' /etc/apt/sources.list && \
+    echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
+
+WORKDIR /app
+COPY --from=builder /app /app
+
+ENTRYPOINT ["sh", "-c"]
+CMD ["echo", "No command provided"]
